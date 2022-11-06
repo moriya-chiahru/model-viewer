@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>model-viewer</title>
+    <meta name="robots" content="noindex">
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+    <style>
+      body {
+        margin: 0;
+      }
+      model-viewer {
+        width: 100%;
+        height: 100vh;
+        background-color: #2d3143;
+      }
+      #control {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 9999;
+        color: #fff;
+        background-color: #20213b;
+      }
+      #control summary {
+        font-size: 12px;
+        cursor: pointer;
+        padding: 2px 8px;
+      }
+      #control ul {
+        list-style: none;
+        padding: 8px 12px;
+      }
+      #control ul li {
+        padding-bottom: 12px;
+      }
+      #control ul li input[type="number"]{
+        width:3em;
+      }
+    </style>
+  </head>
+  <body>
+    <details id="control">
+      <summary>Control</summary>
+      <ul>
+      <li><input type="file" id="fileUpload"></li>
+      <li>背景色の選択：<input type="color" id="colorChenge" value="#2d3143"></li>
+      <li>縦角度： 
+          <input type="range" id="rangePitch" value="0" min="0" max="360">
+          <input id="numberPitch" value="0" size="3" type="number"></li>
+      <li>横角度：
+          <input type="range" id="rangeYaw" value="0" min="0" max="360">
+          <input id="numberYaw" value="0" size="3" type="number"></li>
+    </ul>
+    </details>
+    <div id="modelViewerWapper">
+      <model-viewer alt="" camera-orbit = "0deg 90deg 90deg"></model-viewer>
+    </div>
+     <script>
+      const elmModelViewer = document.querySelector("model-viewer");
+      const elmModelViewerWapper = document.getElementById('modelViewerWapper');
+      const inputs = {colorChenge : document.getElementById('colorChenge'),
+      fileUpload: document.getElementById('fileUpload'),
+      numberPitch: document.querySelector('#numberPitch'),
+      numberYaw: document.querySelector('#numberYaw'),
+      rangePitch: document.querySelector('#rangePitch'),
+      rangeYaw: document.querySelector('#rangeYaw')}
+
+      // 背景色変更
+       function methodColorChange() { 
+        elmModelViewer.style.backgroundColor=inputs.colorChenge.value;
+       }
+
+      function methodLoadLocalFile(e) {
+        // ファイル情報を取得
+        const fileData = e.target.files[0];
+
+        // FileReaderオブジェクトを使ってファイル読み込み
+        const reader = new FileReader();
+        // ファイル読み込みに成功したときの処理
+        reader.onload = function() {
+          // ブラウザ上に画像を表示する
+          elmModelViewer.src = reader.result;
+          elmModelViewerWapper.appendChild(elmModelViewer);
+        }
+        // ファイル読み込みを実行
+        reader.readAsDataURL(fileData);
+      }
+
+      // 角度調整
+      const methodUpdateOrientation = (e) => {
+        const synchronizeInput = e.target.id.replace(e.target.type, e.target.type === "number" ? "range" : "number" );
+        inputs[synchronizeInput].value = e.target.value;
+        elmModelViewer.orientation = `0deg ${inputs.numberPitch.value}deg ${inputs.numberYaw.value}deg`;
+      };
+
+      // イベントセット
+      inputs.fileUpload.addEventListener('change', methodLoadLocalFile, false);
+      inputs.colorChenge.addEventListener('change', methodColorChange, false);
+      inputs.numberPitch.addEventListener('change',methodUpdateOrientation, false);
+      inputs.numberYaw.addEventListener('change',methodUpdateOrientation, false);
+      inputs.rangePitch.addEventListener('change',methodUpdateOrientation, false);
+      inputs.rangeYaw.addEventListener('change',methodUpdateOrientation, false);
+     </script>
+
+  </body>
+</html>
